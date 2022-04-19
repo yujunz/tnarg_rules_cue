@@ -3,6 +3,7 @@ package cuelang
 import (
 	"fmt"
 	"log"
+	"os"
 	"path"
 	"path/filepath"
 	"sort"
@@ -15,6 +16,15 @@ import (
 	"github.com/bazelbuild/bazel-gazelle/rule"
 	"github.com/iancoleman/strcase"
 )
+
+func isModRoot(dir string) bool {
+	const modDir = "cue.mod"
+	if dir[len(dir)-1] == filepath.Separator {
+		return true
+	}
+	info, err := os.Stat(path.Join(dir, modDir))
+	return !os.IsNotExist(err) && info.IsDir()
+}
 
 // GenerateRules extracts build metadata from source files in a
 // directory.  GenerateRules is called in each directory where an
@@ -51,7 +61,7 @@ func (cl *cueLang) GenerateRules(args language.GenerateArgs) language.GenerateRe
 	baseImportPath := computeImportPath(args)
 
 	// categorize cue files into export and library sources
-	// cue_libary names are based on cue package name.
+	// cue_library names are based on cue package name.
 	libraries := make(map[string]*cueLibrary)
 	exports := make(map[string]*cueExport)
 
@@ -79,10 +89,28 @@ func (cl *cueLang) GenerateRules(args language.GenerateArgs) language.GenerateRe
 				} else {
 					importPath = fmt.Sprintf("%s:%s", baseImportPath, pkg)
 				}
+				const cueGlob = "*.cue"
+				var (
+					cf  []string
+					dir string
+					parentPath *string
+				)
+				// Walk up to parent directory containing cue files until mod root
+				for dir = filepath.Dir(cueFile.Filename); cf != nil || isModRoot(dir); {
+					dir = filepath.Dir(dir)
+					cf, _ = filepath.Glob(path.Join(dir, cueGlob))
+				}
+				if cf != nil {
+					parentPath = &dir
+				}
 				lib = &cueLibrary{
 					Name:       tgt,
 					ImportPath: importPath,
 					Imports:    make(map[string]bool),
+					ParentPath: parentPath,
+				}
+				if parentPath != nil {
+					lib.Imports[*parentPath] = true
 				}
 				libraries[tgt] = lib
 			}
@@ -166,6 +194,7 @@ type cueLibrary struct {
 	ImportPath string
 	Srcs       []string
 	Imports    map[string]bool
+	ParentPath *string
 }
 
 func (cl *cueLibrary) ToRule() *rule.Rule {
