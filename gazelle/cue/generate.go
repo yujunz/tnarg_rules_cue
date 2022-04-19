@@ -51,7 +51,7 @@ func (cl *cueLang) GenerateRules(args language.GenerateArgs) language.GenerateRe
 	baseImportPath := computeImportPath(args)
 
 	// categorize cue files into export and library sources
-	// cue_libary names are based on cue package name.
+	// cue_library names are based on cue package name.
 	libraries := make(map[string]*cueLibrary)
 	exports := make(map[string]*cueExport)
 
@@ -79,10 +79,12 @@ func (cl *cueLang) GenerateRules(args language.GenerateArgs) language.GenerateRe
 				} else {
 					importPath = fmt.Sprintf("%s:%s", baseImportPath, pkg)
 				}
+				modPath := getModPath(cueFile.Filename)
 				lib = &cueLibrary{
 					Name:       tgt,
 					ImportPath: importPath,
 					Imports:    make(map[string]bool),
+					ModPath:    modPath,
 				}
 				libraries[tgt] = lib
 			}
@@ -91,6 +93,7 @@ func (cl *cueLang) GenerateRules(args language.GenerateArgs) language.GenerateRe
 				imprt := strings.Trim(imprt.Path.Value, "\"")
 				lib.Imports[imprt] = true
 			}
+			importContexts(lib)
 		}
 	}
 
@@ -111,6 +114,16 @@ func (cl *cueLang) GenerateRules(args language.GenerateArgs) language.GenerateRe
 	res.Empty = generateEmpty(args.File, libraries, exports)
 
 	return res
+}
+
+func getModPath(fn string) string {
+	// TODO(yujunz) walk up to cue.mod
+	return "/"
+}
+
+func importContexts(library *cueLibrary) {
+	// TODO(yujunz) add implicit contexts to imports
+	return
 }
 
 func computeImportPath(args language.GenerateArgs) string {
@@ -166,6 +179,7 @@ type cueLibrary struct {
 	ImportPath string
 	Srcs       []string
 	Imports    map[string]bool
+	ModPath    string
 }
 
 func (cl *cueLibrary) ToRule() *rule.Rule {
