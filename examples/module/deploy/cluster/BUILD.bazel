@@ -1,0 +1,9 @@
+load("@com_github_tnarg_rules_cue//cue:cue.bzl", "cue_library")
+
+cue_library(
+    name = "cue_deploy_library",
+    srcs = ["cluster.cue"],
+    importpath = "github.com/tnarg/rules_cue/examples/module/deploy/cluster:deploy",
+    visibility = ["//visibility:public"],
+    deps = ["@com_github_tnarg_rules_cue//examples/module/deploy:cue_deploy_library"],
+)

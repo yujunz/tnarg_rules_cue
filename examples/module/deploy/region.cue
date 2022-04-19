@@ -1,0 +1,3 @@
+package deploy
+
+region: "local"
