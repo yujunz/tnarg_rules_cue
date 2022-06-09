@@ -1,6 +1,10 @@
 package cuelang
 
 import (
+	"log"
+	"regexp"
+	"strings"
+
 	"github.com/bazelbuild/bazel-gazelle/config"
 	"github.com/bazelbuild/bazel-gazelle/pathtools"
 )
@@ -44,7 +48,9 @@ func buildPackages(c *config.Config, dir, rel string, cueFiles []fileInfo) (pack
 				rel:  rel,
 			}
 		}
-		// TODO(yujunz): addFile
+		if err := packageMap[f.packageName].addFile(c, f); err != nil {
+			log.Print(err)
+		}
 	}
 	return packageMap, cueFilesWithUnkonwnPackage
 }
@@ -70,4 +76,47 @@ func selectPackage(c *config.Config, dir string, packageMap map[string]*cuePacka
 func defaultPackageName(c *config.Config, rel string) string {
 	cc := getCueConfig(c)
 	return pathtools.RelBaseName(rel, cc.prefix, "")
+}
+
+// namingConvention determines how go targets are named.
+type namingConvention int
+
+const (
+	// Try to detect the naming convention in use.
+	unknownNamingConvention namingConvention = iota
+
+	// For an import path that ends with foo, the cue_instance rules target is
+	// named 'foo'
+	importNamingConvention
+)
+
+// Matches a package version, eg. the end segment of 'example.com/foo/v1'
+var pkgVersionRe = regexp.MustCompile("^v[0-9]+$")
+
+// instNameFromImportPath returns a a suitable cue_instance name based on the import path.
+// Major version suffixes (eg. "v1") are dropped.
+func instNameFromImportPath(dir string) string {
+	i := strings.LastIndexAny(dir, "/\\")
+	if i < 0 {
+		return dir
+	}
+	name := dir[i+1:]
+	if pkgVersionRe.MatchString(name) {
+		dir := dir[:i]
+		i = strings.LastIndexAny(dir, "/\\")
+		if i >= 0 {
+			name = dir[i+1:]
+		}
+	}
+	return strings.ReplaceAll(name, ".", "_")
+}
+
+// instNameByConvention returns a suitable name for a cue_instance using the given
+// naming convention, the import path, and the package name.
+func instNameByConvention(nc namingConvention, imp string, pkgName string) string {
+	name := instNameFromImportPath(imp)
+	if name == "" {
+		name = pkgName
+	}
+	return name
 }

@@ -29,7 +29,12 @@ import (
 
 const cueName = "cue"
 
-type cueLang struct{}
+type cueLang struct {
+	// cuePkgRels is a set of relative paths to directories containing buildable
+	// Cue code. If the value is false, it means the directory does not contain
+	// buildable Cue code, but it has a subdir which does.
+	cuePkgRels map[string]bool
+}
 
 func NewLanguage() language.Language {
 	return &cueLang{}
