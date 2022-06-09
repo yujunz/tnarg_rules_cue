@@ -39,10 +39,6 @@ func (*cueLang) Name() string {
 	return cueName
 }
 
-func (*cueLang) Loads() []rule.LoadInfo {
-	return nil
-}
-
 func (*cueLang) RegisterFlags(fs *flag.FlagSet, cmd string, c *config.Config) {
 }
 
