@@ -53,13 +53,6 @@ func (*cueLang) KnownDirectives() []string {
 func (*cueLang) Configure(c *config.Config, rel string, f *rule.File) {
 }
 
-func (*cueLang) GenerateRules(args language.GenerateArgs) language.GenerateResult {
-	return language.GenerateResult{
-		Gen:     []*rule.Rule{rule.NewRule("cue_library", "cue_default_library")},
-		Imports: []interface{}{nil},
-	}
-}
-
 func (*cueLang) Fix(c *config.Config, f *rule.File) {
 }
 
