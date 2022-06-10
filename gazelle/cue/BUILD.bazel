@@ -27,6 +27,10 @@ go_library(
 
 go_test(
     name = "cue_test",
-    srcs = ["fileinfo_test.go"],
+    srcs = [
+        "fileinfo_cue_test.go",
+        "fileinfo_test.go",
+    ],
     embed = [":cue"],
+    deps = ["@com_github_google_go_cmp//cmp"],
 )
