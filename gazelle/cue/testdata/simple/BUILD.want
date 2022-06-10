@@ -1,0 +1,9 @@
+load("@com_github_yujunz_rules_cue//cue:cue.bzl", "cue_instance")
+
+cue_instance(
+    name = "simple",
+    srcs = ["simple.cue"],
+    _gazelle_imports = [],
+    importpath = "",
+    visibility = ["//visibility:public"],
+)
