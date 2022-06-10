@@ -1,12 +1,14 @@
 package cuelang
 
 import (
+	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/bazelbuild/bazel-gazelle/config"
 	"github.com/bazelbuild/bazel-gazelle/language"
 	"github.com/bazelbuild/bazel-gazelle/resolve"
+	"github.com/bazelbuild/bazel-gazelle/rule"
 	"github.com/bazelbuild/bazel-gazelle/testtools"
 	"github.com/bazelbuild/bazel-gazelle/walk"
 )
@@ -47,5 +49,33 @@ func TestCommandLine(t *testing.T) {
 	cc := getCueConfig(c)
 	if cc.prefix != "example.com/repo" {
 		t.Errorf(`got prefix %q; want "example.com/repo"`, cc.prefix)
+	}
+}
+
+func TestDirectives(t *testing.T) {
+	c, _, cexts := testConfig(t)
+	content := []byte(`
+# gazelle:importmap_prefix x
+# gazelle:prefix y
+`)
+	f, err := rule.LoadData(filepath.FromSlash("test/BUILD.bazel"), "test", content)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, cext := range cexts {
+		cext.Configure(c, "test", f)
+	}
+	cc := getCueConfig(c)
+	if cc.prefix != "y" {
+		t.Errorf(`got prefix %q; want "y"`, cc.prefix)
+	}
+	if cc.prefixRel != "test" {
+		t.Errorf(`got prefixRel %q; want "test"`, cc.prefixRel)
+	}
+	if cc.importMapPrefix != "x" {
+		t.Errorf(`got importMapPrefix %q; want "x"`, cc.importMapPrefix)
+	}
+	if cc.importMapPrefixRel != "test" {
+		t.Errorf(`got importPrefixRel %q; want "test"`, cc.importMapPrefixRel)
 	}
 }

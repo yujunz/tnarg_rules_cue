@@ -86,6 +86,7 @@ func (*cueLang) Configure(c *config.Config, rel string, f *rule.File) {
 	} else {
 		cc = raw.(*cueConfig).clone()
 	}
+	c.Exts[cueName] = cc
 
 	if f != nil {
 		setPrefix := func(prefix string) {
