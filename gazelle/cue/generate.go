@@ -144,7 +144,7 @@ const (
 )
 
 // cueTarget contains information used to generate an individual Cue rule
-// (insatnce, or module).
+// (instance, or module).
 type cueTarget struct {
 	sources, imports platformStringsBuilder
 }
@@ -175,6 +175,7 @@ func (g *generator) generateInst(pkg *cuePackage) *rule.Rule {
 
 	g.setCommonAttrs(cueInstance, pkg.rel, visibility, pkg.instance)
 	g.setImportAttrs(cueInstance, pkg.importPath)
+	cueInstance.SetAttr("package_name", pkg.name)
 	return cueInstance
 }
 

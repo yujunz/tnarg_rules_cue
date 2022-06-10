@@ -147,7 +147,7 @@ def _add_common_instance_consuming_attrs_to(attrs):
     attrs.update({
         "instance": attr.label(
             doc = """CUE instance to export.
- 
+
 This value must refer either to a target using the cue_instance rule
 or another rule that yields a CUEInstanceInfo provider.""",
             providers = [CUEInstanceInfo],
@@ -385,7 +385,7 @@ cue_instance.""",
             doc = """Name of the CUE package to load for this instance.
 
 If left unspecified, use the basename of the containing directory as
-the CUE pacakge name.""",
+the CUE package name.""",
         ),
         "srcs": attr.label_list(
             doc = "CUE input files that are part of the nominated CUE package.",
