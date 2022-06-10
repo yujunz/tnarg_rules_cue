@@ -34,7 +34,7 @@ func fileNameInfo(path_ string) fileInfo {
 	name := filepath.Base(path_)
 	var ext ext
 	switch path.Ext(name) {
-	case ".go":
+	case ".cue":
 		ext = cueExt
 	default:
 		ext = unknownExt
