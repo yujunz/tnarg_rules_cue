@@ -10,7 +10,7 @@ go_library(
         "lang.go",
         "package.go",
     ],
-    importpath = "github.com/seh/rules_cue/gazelle/cue",
+    importpath = "github.com/yujunz/rules_cue/gazelle/cue",
     visibility = ["//visibility:public"],
     deps = [
         "@bazel_gazelle//config:go_default_library",

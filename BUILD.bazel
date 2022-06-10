@@ -3,7 +3,7 @@ load(
     "gazelle",
 )
 
-# gazelle:prefix github.com/seh/rules_cue
+# gazelle:prefix github.com/yujunz/rules_cue
 gazelle(
     name = "gazelle",
 )

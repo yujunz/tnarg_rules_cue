@@ -15,6 +15,7 @@ def go_dependencies():
     )
     go_repository(
         name = "com_github_bazelbuild_buildtools",
+        build_naming_convention = "go_default_library",
         importpath = "github.com/bazelbuild/buildtools",
         sum = "h1:ox8T5nCkvLflRgKZ6uzzdvLDN3gbNZBgLBqA5Xgn7QA=",
         version = "v0.0.0-20220323134444-a9f46b2bb3de",

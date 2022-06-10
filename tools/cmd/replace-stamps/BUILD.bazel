@@ -9,6 +9,13 @@ go_library(
 
 go_binary(
     name = "replace-stamps",
-    embed = [":replace_stamps_lib"],
+    embed = [":replace-stamps_lib"],
     visibility = ["//visibility:public"],
+)
+
+go_library(
+    name = "replace-stamps_lib",
+    srcs = ["replace.go"],
+    importpath = "github.com/yujunz/rules_cue/tools/cmd/replace-stamps",
+    visibility = ["//visibility:private"],
 )
