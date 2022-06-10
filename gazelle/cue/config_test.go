@@ -79,3 +79,47 @@ func TestDirectives(t *testing.T) {
 		t.Errorf(`got importPrefixRel %q; want "test"`, cc.importMapPrefixRel)
 	}
 }
+
+func TestPrefixFallback(t *testing.T) {
+	c, _, cexts := testConfig(t)
+	for _, tc := range []struct {
+		desc, content, want string
+	}{
+		{
+			desc: "cue_prefix",
+			content: `
+cue_prefix("example.com/repo")
+`,
+			want: "example.com/repo",
+		}, {
+			desc: "gazelle",
+			content: `
+gazelle(
+    name = "gazelle",
+    prefix = "example.com/repo",
+)
+`,
+			want: "example.com/repo",
+		},
+	} {
+		t.Run(tc.desc, func(t *testing.T) {
+			f, err := rule.LoadData("BUILD.bazel", "", []byte(tc.content))
+			if err != nil {
+				t.Fatal(err)
+			}
+			for _, cext := range cexts {
+				cext.Configure(c, "x", f)
+			}
+			cc := getCueConfig(c)
+			if !cc.prefixSet {
+				t.Fatalf("prefix not set")
+			}
+			if cc.prefix != tc.want {
+				t.Errorf("prefix: want %q; got %q", cc.prefix, tc.want)
+			}
+			if cc.prefixRel != "x" {
+				t.Errorf("rel: got %q; want %q", cc.prefixRel, "x")
+			}
+		})
+	}
+}
