@@ -166,8 +166,7 @@ type generator struct {
 }
 
 func (g *generator) generateInst(pkg *cuePackage) *rule.Rule {
-	cc := getCueConfig(g.c)
-	name := instNameByConvention(cc.cueNamingConvention, pkg.importPath, pkg.name)
+	name := instNameByConvention(pkg.importPath, pkg.name)
 	cueInstance := rule.NewRule("cue_instance", name)
 	if !pkg.instance.sources.hasCue() {
 		return cueInstance // empty

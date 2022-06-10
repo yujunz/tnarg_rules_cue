@@ -17,8 +17,6 @@ limitations under the License.
 package cuelang
 
 import (
-	"flag"
-
 	"github.com/bazelbuild/bazel-gazelle/config"
 	"github.com/bazelbuild/bazel-gazelle/label"
 	"github.com/bazelbuild/bazel-gazelle/language"
@@ -37,25 +35,11 @@ type cueLang struct {
 }
 
 func NewLanguage() language.Language {
-	return &cueLang{}
+	return &cueLang{cuePkgRels: make(map[string]bool)}
 }
 
 func (*cueLang) Name() string {
 	return cueName
-}
-
-func (*cueLang) RegisterFlags(fs *flag.FlagSet, cmd string, c *config.Config) {
-}
-
-func (*cueLang) CheckFlags(fs *flag.FlagSet, c *config.Config) error {
-	return nil
-}
-
-func (*cueLang) KnownDirectives() []string {
-	return nil
-}
-
-func (*cueLang) Configure(c *config.Config, rel string, f *rule.File) {
 }
 
 func (*cueLang) Fix(c *config.Config, f *rule.File) {

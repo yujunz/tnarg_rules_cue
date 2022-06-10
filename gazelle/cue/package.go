@@ -78,18 +78,6 @@ func defaultPackageName(c *config.Config, rel string) string {
 	return pathtools.RelBaseName(rel, cc.prefix, "")
 }
 
-// namingConvention determines how go targets are named.
-type namingConvention int
-
-const (
-	// Try to detect the naming convention in use.
-	unknownNamingConvention namingConvention = iota
-
-	// For an import path that ends with foo, the cue_instance rules target is
-	// named 'foo'
-	importNamingConvention
-)
-
 // Matches a package version, eg. the end segment of 'example.com/foo/v1'
 var pkgVersionRe = regexp.MustCompile("^v[0-9]+$")
 
@@ -111,9 +99,9 @@ func instNameFromImportPath(dir string) string {
 	return strings.ReplaceAll(name, ".", "_")
 }
 
-// instNameByConvention returns a suitable name for a cue_instance using the given
-// naming convention, the import path, and the package name.
-func instNameByConvention(nc namingConvention, imp string, pkgName string) string {
+// instNameByConvention returns a suitable name for a cue_instance
+// using the import path, and the package name.
+func instNameByConvention(imp string, pkgName string) string {
 	name := instNameFromImportPath(imp)
 	if name == "" {
 		name = pkgName
