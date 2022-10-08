@@ -1,4 +1,7 @@
+load("@bazel_gazelle//:def.bzl", "gazelle", "gazelle_binary")
 load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+
+# gazelle:exclude testdata
 
 go_library(
     name = "cue",
@@ -34,8 +37,13 @@ go_test(
         "fileinfo_cue_test.go",
         "fileinfo_test.go",
         "generate_test.go",
+        "lang_test.go",
     ],
-    data = glob(["testdata/**"]),
+    data = [
+        ":gazelle-cue",
+    ] + glob([
+        "testdata/**",
+    ]),
     embed = [":cue"],
     deps = [
         "@bazel_gazelle//config:go_default_library",
@@ -47,5 +55,23 @@ go_test(
         "@bazel_gazelle//walk:go_default_library",
         "@com_github_bazelbuild_buildtools//build:go_default_library",
         "@com_github_google_go_cmp//cmp",
+        "@io_bazel_rules_go//go/tools/bazel:go_default_library",
     ],
+)
+
+# This gazelle binary is used exclusively for testing the gazelle language
+# extension and thus only has the cue language installed.
+gazelle_binary(
+    name = "gazelle-cue",
+    languages = [":cue"],
+    visibility = [
+        # Also make the binary available in the root of the repo for use, but
+        # not externally.
+        "//:__pkg__",
+    ],
+)
+
+gazelle(
+    name = "gazelle",
+    gazelle = ":gazelle-cue",
 )
